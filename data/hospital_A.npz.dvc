@@ -1,0 +1,5 @@
+outs:
+- md5: 37d05e6faaea7276c4135ce87907fc48
+  size: 9367693
+  hash: md5
+  path: hospital_A.npz

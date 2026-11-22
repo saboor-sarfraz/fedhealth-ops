@@ -1,0 +1,12 @@
+wfdb
+numpy
+scipy
+torch
+pandas
+matplotlib
+scikit-learn
+flwr==1.43.0
+mlflow
+dvc
+fastapi
+uvicorn

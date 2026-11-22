@@ -1,0 +1,5 @@
+outs:
+- md5: ddc4b26491e937a5da0ca69eacfd0fe1
+  size: 36796388
+  hash: md5
+  path: global_test.npz

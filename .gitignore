@@ -1,0 +1,18 @@
+# Python and Conda environments
+venv/
+.venv/
+__pycache__/
+*.py[cod]
+
+# Local experiment tracking and generated evaluation artifacts
+mlruns/
+outputs/evaluation/
+
+# Local source archive and extracted MIT-BIH records
+raw_zip/
+
+# Temporary files and local DVC remote storage
+*.tmp
+*.temp
+*.log
+dvc_storage/

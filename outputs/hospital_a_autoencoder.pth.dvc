@@ -1,0 +1,5 @@
+outs:
+- md5: f53928d2d66ddff76c50047f53aea330
+  size: 88269
+  hash: md5
+  path: hospital_a_autoencoder.pth

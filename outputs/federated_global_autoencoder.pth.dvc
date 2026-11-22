@@ -1,0 +1,5 @@
+outs:
+- md5: bbce5972795756597d2bf55db30897ad
+  size: 88441
+  hash: md5
+  path: federated_global_autoencoder.pth

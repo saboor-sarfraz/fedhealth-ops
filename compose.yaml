@@ -1,0 +1,114 @@
+services:
+  flower-server:
+    image: fedhealth-ops:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command: ["python", "-m", "hospital_clients.server"]
+    environment:
+      SERVER_BIND_ADDRESS: "0.0.0.0:8080"
+    volumes:
+      - type: bind
+        source: ./outputs
+        target: /app/outputs
+    expose:
+      - "8080"
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import socket; connection = socket.create_connection(('127.0.0.1', 8080), timeout=2); connection.close()",
+        ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 15s
+    networks:
+      - fedhealth-net
+
+  api:
+    image: fedhealth-ops:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    command:
+      [
+        "python",
+        "-m",
+        "uvicorn",
+        "api.main:app",
+        "--host",
+        "0.0.0.0",
+        "--port",
+        "8000",
+      ]
+    ports:
+      - "8000:8000"
+    volumes:
+      - type: bind
+        source: ./outputs/federated_global_autoencoder.pth
+        target: /app/outputs/federated_global_autoencoder.pth
+        read_only: true
+      - type: bind
+        source: ./outputs/evaluation/model_comparison_metrics.csv
+        target: /app/outputs/evaluation/model_comparison_metrics.csv
+        read_only: true
+    networks:
+      - fedhealth-net
+
+  hospital-a:
+    image: fedhealth-ops:local
+    command: ["python", "-m", "hospital_clients.client"]
+    environment:
+      HOSPITAL_ID: "A"
+      SERVER_ADDRESS: "flower-server:8080"
+    volumes:
+      - type: bind
+        source: ./data/hospital_A.npz
+        target: /app/data/hospital_A.npz
+        read_only: true
+    depends_on:
+      flower-server:
+        condition: service_healthy
+    networks:
+      - fedhealth-net
+
+  hospital-b:
+    image: fedhealth-ops:local
+    command: ["python", "-m", "hospital_clients.client"]
+    environment:
+      HOSPITAL_ID: "B"
+      SERVER_ADDRESS: "flower-server:8080"
+    volumes:
+      - type: bind
+        source: ./data/hospital_B.npz
+        target: /app/data/hospital_B.npz
+        read_only: true
+    depends_on:
+      flower-server:
+        condition: service_healthy
+    networks:
+      - fedhealth-net
+
+  hospital-c:
+    image: fedhealth-ops:local
+    command: ["python", "-m", "hospital_clients.client"]
+    environment:
+      HOSPITAL_ID: "C"
+      SERVER_ADDRESS: "flower-server:8080"
+    volumes:
+      - type: bind
+        source: ./data/hospital_C.npz
+        target: /app/data/hospital_C.npz
+        read_only: true
+    depends_on:
+      flower-server:
+        condition: service_healthy
+    networks:
+      - fedhealth-net
+
+networks:
+  fedhealth-net:
+    driver: bridge
