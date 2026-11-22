@@ -109,6 +109,30 @@ services:
     networks:
       - fedhealth-net
 
+  # One-shot full reproduction. Not started by plain `docker compose up`:
+  #   docker compose --profile pipeline run --rm pipeline
+  pipeline:
+    image: fedhealth-ops:local
+    build:
+      context: .
+      dockerfile: Dockerfile
+    profiles: ["pipeline"]
+    working_dir: /app
+    command: ["bash", "reproduce.sh"]
+    environment:
+      AWS_ACCESS_KEY_ID:
+      AWS_SECRET_ACCESS_KEY:
+      SKIP_DVC_PULL:
+      RETRAIN:
+      # The bind-mounted project is owned by the host user, not container root.
+      GIT_CONFIG_COUNT: "1"
+      GIT_CONFIG_KEY_0: safe.directory
+      GIT_CONFIG_VALUE_0: /app
+    volumes:
+      - type: bind
+        source: .
+        target: /app
+
 networks:
   fedhealth-net:
     driver: bridge

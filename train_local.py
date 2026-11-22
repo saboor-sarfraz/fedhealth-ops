@@ -15,6 +15,7 @@ from hospital_clients.training import (
     DEFAULT_BATCH_SIZE,
     DEFAULT_EPOCHS,
     DEFAULT_LEARNING_RATE,
+    SEED,
     get_reconstruction_errors,
     load_hospital_data,
     train_local_model,
@@ -52,6 +53,7 @@ print("Validation samples:", len(X_val))
 # 3. Initialize model
 # --------------------------------------------------
 
+torch.manual_seed(SEED)
 model = ECGAutoencoder().to(DEVICE)
 
 

@@ -1,2 +1,3 @@
 /hospital_a_autoencoder.pth
 /federated_global_autoencoder.pth
+/hospital_a_isolation_forest.joblib

@@ -5,7 +5,6 @@ venv/
 .dvc/
 .dvcignore
 *.dvc
-dvc_storage/
 .vscode/
 .pytest_cache/
 .mypy_cache/
@@ -22,3 +21,5 @@ mlruns/
 *.pt
 *.ckpt
 .DS_Store
+mlflow.db
+.env

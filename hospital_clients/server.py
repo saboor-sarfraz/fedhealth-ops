@@ -15,6 +15,7 @@ from models.autoencoder import ECGAutoencoder
 from hospital_clients.training import (
     DEFAULT_EPOCHS,
     DEFAULT_LEARNING_RATE,
+    SEED,
     ROOT_DIR,
 )
 
@@ -96,6 +97,11 @@ class ReportingFedAvg(FedAvg):
                 f"{sorted(HOSPITAL_IDS)}, received {sorted(participating)}"
             )
 
+        # Fixed client order keeps the floating-point aggregation reproducible.
+        results = sorted(
+            results,
+            key=lambda item: str(item[1].metrics.get("hospital_id", "")),
+        )
         aggregated, metrics = super().aggregate_fit(
             server_round,
             results,
@@ -108,6 +114,7 @@ class ReportingFedAvg(FedAvg):
 
 
 def main() -> None:
+    torch.manual_seed(SEED)
     model = ECGAutoencoder()
     initial_parameters = ndarrays_to_parameters(
         [value.detach().cpu().numpy() for value in model.state_dict().values()]

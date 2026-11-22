@@ -57,6 +57,43 @@ hospitals and their training sample counts. Every round should show
 `outputs/federated_global_autoencoder.pth` on the host after all five rounds
 successfully aggregate.
 
+## Reproduce the full pipeline
+
+One command pulls the DVC data and model checkpoints, validates the data, fits
+the Isolation Forest baseline, evaluates all three models, and logs and
+registers the results in MLflow. The steps are in `reproduce.sh`. By default
+it evaluates the DVC-tracked autoencoder checkpoints, so the metrics match the
+registered ones exactly (about 1 minute). Set `RETRAIN=1` to also retrain the
+local-only and federated autoencoders (seeded, about 50 minutes on CPU).
+
+Credentials: put your DagsHub token in an untracked `.env` file in the project
+root (`reproduce.sh` loads it), or export it as both variables (see
+`DAGSHUB_SETUP.md`):
+
+```bash
+export AWS_ACCESS_KEY_ID="<your-dagshub-token>"
+export AWS_SECRET_ACCESS_KEY="<your-dagshub-token>"
+docker compose --profile pipeline run --rm pipeline
+```
+
+Without Docker (Python environment from `requirements.txt` active):
+
+```bash
+bash reproduce.sh
+```
+
+If `data/` and the checkpoints are already present, skip the download with
+`SKIP_DVC_PULL=1`. For Docker, export `SKIP_DVC_PULL` or `RETRAIN` on the host
+before `docker compose ... run`. Without credentials and without
+`SKIP_DVC_PULL=1`, the script stops at `dvc pull` with a pointer to
+`DAGSHUB_SETUP.md`.
+
+The `pipeline` service bind-mounts the whole project directory to `/app`, so
+the results land on the host: `data/`, `outputs/` (models and
+`outputs/evaluation/`), `mlflow.db` and `mlruns/`. The service is in the
+`pipeline` profile, so plain `docker compose up` does not start it. On Linux,
+files written by the container are owned by root.
+
 ## Stop and clean up
 
 Stop and remove the containers and Compose network with:

@@ -7,6 +7,6 @@ matplotlib
 scikit-learn
 flwr==1.43.0
 mlflow
-dvc
+dvc[s3]
 fastapi
 uvicorn

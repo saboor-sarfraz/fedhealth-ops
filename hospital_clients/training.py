@@ -9,6 +9,7 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 
+from data_validation import validate_hospital_file
 from models.autoencoder import ECGAutoencoder
 
 
@@ -16,6 +17,7 @@ ROOT_DIR = Path(__file__).resolve().parents[1]
 DEFAULT_BATCH_SIZE = 128
 DEFAULT_EPOCHS = 30
 DEFAULT_LEARNING_RATE = 0.001
+SEED = 42
 
 
 @dataclass
@@ -33,28 +35,7 @@ def load_hospital_data(hospital_id: str) -> tuple[np.ndarray, np.ndarray]:
     if hospital_id not in {"A", "B", "C"}:
         raise ValueError("hospital_id must be one of 'A', 'B', or 'C'")
 
-    dataset_path = ROOT_DIR / "data" / f"hospital_{hospital_id}.npz"
-    with np.load(dataset_path, allow_pickle=False) as dataset:
-        required_keys = {"x_train", "x_val"}
-        missing_keys = required_keys.difference(dataset.files)
-        if missing_keys:
-            raise ValueError(
-                f"{dataset_path} is missing required arrays: "
-                f"{', '.join(sorted(missing_keys))}"
-            )
-        x_train = dataset["x_train"]
-        x_val = dataset["x_val"]
-
-    for name, samples in (("x_train", x_train), ("x_val", x_val)):
-        if samples.ndim != 2 or samples.shape[1] != 200:
-            raise ValueError(
-                f"{dataset_path} array '{name}' must have shape (N, 200); "
-                f"received {samples.shape}"
-            )
-        if len(samples) == 0:
-            raise ValueError(f"{dataset_path} array '{name}' is empty")
-
-    return x_train, x_val
+    return validate_hospital_file(ROOT_DIR / "data" / f"hospital_{hospital_id}.npz")
 
 
 def evaluate_validation_loss(
@@ -97,6 +78,7 @@ def train_local_model(
     device: torch.device | None = None,
     best_model_path: str | Path | None = None,
     verbose: bool = False,
+    seed: int = SEED,
 ) -> tuple[ECGAutoencoder, TrainingMetrics]:
     """Train a model locally and restore the weights with lowest validation MSE."""
     if epochs <= 0:
@@ -111,6 +93,7 @@ def train_local_model(
         TensorDataset(train_tensor),
         batch_size=batch_size,
         shuffle=True,
+        generator=torch.Generator().manual_seed(seed),
     )
     model = model.to(device)
     criterion = nn.MSELoss()

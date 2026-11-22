@@ -1,0 +1,5 @@
+outs:
+- md5: 070f3555d5c91d18677908362578308c
+  size: 2543229
+  hash: md5
+  path: hospital_a_isolation_forest.joblib
