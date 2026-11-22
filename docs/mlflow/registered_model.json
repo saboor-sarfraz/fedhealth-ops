@@ -1,0 +1,18 @@
+{
+  "registered_model": "fedhealth-ecg-anomaly-detector",
+  "aliases": {
+    "champion": 1
+  },
+  "champion_version": 1,
+  "status": "READY",
+  "source": "runs:/87106f99eed84396960599a69ac1f553/model",
+  "run_id": "87106f99eed84396960599a69ac1f553",
+  "run_name": "IsolationForest-Baseline",
+  "metrics": {
+    "Accuracy": 0.5897967397866773,
+    "Precision": 0.3800431063514515,
+    "Recall": 0.8511199939663625,
+    "F1-score": 0.5254580588084651,
+    "ROC-AUC": 0.7902816443278702
+  }
+}
